@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fitness Garage Gym — WhatsApp Bot Demo</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#060a0e;--accent:#00e676;--wa-dark:#0b141a;--wa-chat:#080d11;--wa-in:#1e2a30;--wa-out:#005c4b;--wa-hdr:#1f2c33;--txt:#e9edef;--txt2:#8696a0;--btn:#00a884}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);font-family:'DM Sans',sans-serif;color:#fff;min-height:100vh;overflow-x:hidden}
+
+.hero{text-align:center;padding:50px 20px 16px;position:relative;z-index:1}
+.hero::before{content:'';position:absolute;top:-40%;left:50%;transform:translateX(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(0,230,118,0.06) 0%,transparent 70%);pointer-events:none}
+.hero .pill{display:inline-block;background:rgba(0,230,118,0.08);border:1px solid rgba(0,230,118,0.2);color:var(--accent);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:5px 14px;border-radius:100px;margin-bottom:18px}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(32px,7vw,56px);letter-spacing:2px;line-height:1.05}
+.hero h1 em{font-style:normal;color:var(--accent)}
+.hero p{color:var(--txt2);font-size:14px;margin-top:10px;max-width:400px;margin-inline:auto;line-height:1.55}
+.hero .hint{margin-top:20px;color:var(--accent);font-size:13px;font-weight:600;opacity:0;animation:fadeInUp .6s .8s forwards}
+
+.wrap{display:flex;justify-content:center;padding:16px 16px 50px;position:relative;z-index:1}
+.phone{width:375px;max-width:100%;height:750px;background:var(--wa-dark);border-radius:40px;border:2px solid rgba(255,255,255,0.07);overflow:hidden;position:relative;box-shadow:0 30px 100px rgba(0,0,0,0.5),0 0 100px rgba(0,230,118,0.04)}
+.phone::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:140px;height:27px;background:#000;border-radius:0 0 18px 18px;z-index:50}
+.hdr{background:var(--wa-hdr);padding:42px 14px 10px;display:flex;align-items:center;gap:10px;border-bottom:1px solid rgba(255,255,255,0.04)}
+.hdr .back{color:var(--txt2);font-size:20px}
+.hdr .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#00897b);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#000;flex-shrink:0}
+.hdr .info h3{font-size:14px;font-weight:600;color:var(--txt)}
+.hdr .info span{font-size:11px;color:var(--txt2)}
+.hdr .vf{color:#53bdeb;font-size:13px;margin-left:2px}
+
+.chat{height:calc(100% - 86px);overflow-y:auto;padding:10px 10px 14px;background:var(--wa-chat);display:flex;flex-direction:column;gap:5px;scroll-behavior:smooth}
+.chat::-webkit-scrollbar{width:3px}
+.chat::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:4px}
+
+.m{max-width:86%;padding:7px 10px;border-radius:9px;font-size:13px;line-height:1.44;color:var(--txt);opacity:0;transform:translateY(10px);animation:mi .3s ease forwards;word-wrap:break-word}
+.m.i{background:var(--wa-in);align-self:flex-start;border-top-left-radius:2px}
+.m.o{background:var(--wa-out);align-self:flex-end;border-top-right-radius:2px}
+.m .t{font-size:10px;color:rgba(255,255,255,0.4);float:right;margin-left:8px;margin-top:3px}
+.m .t .tk{color:#53bdeb;margin-left:2px}
+.m b{color:var(--accent);font-weight:600}
+
+.bw{align-self:flex-start;display:flex;flex-direction:column;gap:3px;max-width:86%;opacity:0;transform:translateY(10px);animation:mi .3s ease forwards}
+.bt{background:var(--wa-in);border:1px solid rgba(0,168,132,0.22);color:#00a884;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 14px;border-radius:9px;cursor:pointer;transition:all .2s;text-align:center}
+.bt:hover{background:rgba(0,168,132,0.1);border-color:rgba(0,168,132,0.45)}
+.bt.ck{background:rgba(0,168,132,0.12);border-color:var(--btn);pointer-events:none}
+
+.lm{align-self:flex-start;max-width:86%;background:var(--wa-in);border-radius:9px;border-top-left-radius:2px;overflow:hidden;opacity:0;transform:translateY(10px);animation:mi .3s ease forwards}
+.lm .lb{padding:7px 10px;font-size:13px;line-height:1.44;color:var(--txt)}
+.lm .lb .t{font-size:10px;color:rgba(255,255,255,0.4);float:right;margin-left:8px;margin-top:3px}
+.lm .lbtn{display:flex;width:100%;background:none;border:none;border-top:1px solid rgba(255,255,255,0.05);color:#00a884;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;padding:11px 14px;cursor:pointer;transition:background .2s;align-items:center;justify-content:center;gap:5px}
+.lm .lbtn:hover{background:rgba(0,168,132,0.06)}
+
+.ov{position:absolute;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:flex-end;opacity:0;animation:fi .2s ease forwards}
+.sh{background:var(--wa-hdr);width:100%;max-height:65%;border-radius:14px 14px 0 0;overflow-y:auto;animation:su .25s ease forwards}
+.sh-h{padding:14px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--wa-hdr);z-index:2}
+.sh-h h4{font-size:14px;font-weight:600;color:var(--txt)}
+.sh-x{background:none;border:none;color:var(--txt2);font-size:18px;cursor:pointer;padding:4px}
+.sh-sec{font-size:11px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;padding:10px 14px 3px}
+.sh-r{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.025);cursor:pointer;transition:background .15s}
+.sh-r:hover{background:rgba(0,168,132,0.05)}
+.sh-r .rt{font-size:13px;font-weight:500;color:var(--txt)}
+.sh-r .rd{font-size:11px;color:var(--txt2);margin-top:1px}
+
+.cc{align-self:flex-start;max-width:86%;background:var(--wa-in);border-radius:9px;border-top-left-radius:2px;border-left:3px solid var(--accent);padding:10px;opacity:0;transform:translateY(10px);animation:mi .3s ease forwards}
+.cc h4{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px}
+.cc .dr{display:flex;gap:6px;font-size:12.5px;line-height:1.55;color:var(--txt)}
+.cc .dr .ic{flex-shrink:0;width:16px;text-align:center}
+.cc .tip{margin-top:8px;padding-top:7px;border-top:1px solid rgba(255,255,255,0.05);font-size:11.5px;color:var(--txt2);line-height:1.5}
+
+.ty{align-self:flex-start;background:var(--wa-in);padding:10px 16px;border-radius:9px;border-top-left-radius:2px;display:flex;gap:4px;opacity:0;animation:mi .25s ease forwards}
+.ty span{width:6px;height:6px;border-radius:50%;background:var(--txt2);animation:bn 1.2s infinite}
+.ty span:nth-child(2){animation-delay:.15s}
+.ty span:nth-child(3){animation-delay:.3s}
+
+.rb{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,var(--wa-dark) 45%);padding:30px 14px 14px;z-index:60;display:none;justify-content:center}
+.rbtn{background:var(--accent);color:#000;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;border:none;padding:9px 24px;border-radius:100px;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.rbtn:hover{transform:scale(1.03);box-shadow:0 0 20px rgba(0,230,118,0.25)}
+
+/* ============================================ */
+/* FACILITY LIST CARD + POPUP OVERLAY            */
+/* ============================================ */
+.fac-card{align-self:flex-start;max-width:86%;background:var(--wa-in);border-radius:9px;border-top-left-radius:2px;overflow:hidden;opacity:0;transform:translateY(10px);animation:mi .3s ease forwards}
+.fac-card .fac-hdr{padding:7px 10px;font-size:13px;line-height:1.44;color:var(--txt)}
+.fac-card .fac-hdr .t{font-size:10px;color:rgba(255,255,255,0.4);float:right;margin-left:8px;margin-top:3px}
+.fac-row{display:flex;align-items:center;gap:9px;padding:9px 10px;border-top:1px solid rgba(255,255,255,0.035);cursor:pointer;transition:background .15s}
+.fac-row:hover{background:rgba(0,168,132,0.05)}
+.fac-ico{width:44px;height:44px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:22px}
+.fac-rinf{flex:1}
+.fac-rinf .frn{font-size:13px;font-weight:600;color:#fff}
+.fac-rinf .frs{font-size:11px;color:var(--txt2);margin-top:1px}
+.fac-arr{color:var(--txt2);font-size:15px}
+
+/* Facility detail popup — reuses trainer overlay pattern */
+.fac-ov{position:absolute;inset:0;background:rgba(0,0,0,0.82);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;animation:fi .2s ease forwards;padding:16px}
+.fac-popup{background:var(--wa-hdr);border-radius:14px;width:100%;max-width:310px;overflow:hidden;animation:si .25s ease forwards;max-height:92%;overflow-y:auto}
+.fp-top{padding:20px 18px 14px;position:relative}
+.fp-cls{position:absolute;top:10px;right:12px;background:rgba(0,0,0,0.4);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:15px;cursor:pointer;z-index:2;display:flex;align-items:center;justify-content:center}
+.fp-icon{font-size:38px;margin-bottom:8px}
+.fp-name{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:#fff}
+.fp-tag{display:inline-block;font-size:9px;font-weight:800;background:var(--accent);color:#000;padding:2px 6px;border-radius:4px;margin-top:4px}
+.fp-stats{display:flex;gap:16px;margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)}
+.fp-stat{text-align:center}
+.fp-stat .n{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:#fff}
+.fp-stat .l{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px}
+.fp-body{padding:14px 18px}
+.fp-sl{font-size:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.fp-equip{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:14px}
+.fp-eq{font-size:10.5px;padding:3px 8px;border-radius:100px;background:rgba(255,255,255,0.05);color:var(--txt);font-weight:500}
+.fp-desc{font-size:12.5px;color:var(--txt2);line-height:1.5;margin-bottom:12px}
+.fp-highlight{font-size:12px;color:var(--txt2);line-height:1.5;padding:9px 10px;background:rgba(0,230,118,0.06);border-radius:7px;border-left:2px solid var(--accent)}
+
+/* ============================================ */
+/* TRAINER CARD — EMBEDDED AVATAR DESIGNS        */
+/* ============================================ */
+.tr-card{align-self:flex-start;max-width:86%;background:var(--wa-in);border-radius:9px;border-top-left-radius:2px;overflow:hidden;opacity:0;transform:translateY(10px);animation:mi .3s ease forwards}
+.tr-card .trh{padding:7px 10px;font-size:13px;line-height:1.44;color:var(--txt)}
+.tr-card .trh .t{font-size:10px;color:rgba(255,255,255,0.4);float:right;margin-left:8px;margin-top:3px}
+.tr-row{display:flex;align-items:center;gap:9px;padding:9px 10px;border-top:1px solid rgba(255,255,255,0.035);cursor:pointer;transition:background .15s}
+.tr-row:hover{background:rgba(0,168,132,0.05)}
+.tr-av{width:44px;height:44px;border-radius:50%;flex-shrink:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.tr-av svg{width:100%;height:100%}
+.tr-inf{flex:1}
+.tr-inf .trn{font-size:13px;font-weight:600;color:#fff}
+.tr-inf .trs{font-size:11px;color:var(--txt2);margin-top:1px}
+.tr-arr{color:var(--txt2);font-size:15px}
+
+/* TRAINER PROFILE OVERLAY */
+.tp-ov{position:absolute;inset:0;background:rgba(0,0,0,0.82);z-index:200;display:flex;align-items:center;justify-content:center;opacity:0;animation:fi .2s ease forwards;padding:16px}
+.tp-card{background:var(--wa-hdr);border-radius:14px;width:100%;max-width:310px;overflow:hidden;animation:si .25s ease forwards;max-height:92%;overflow-y:auto}
+.tp-ban{width:100%;height:90px;position:relative;overflow:hidden}
+.tp-ban svg{width:100%;height:100%}
+.tp-cls{position:absolute;top:8px;right:10px;background:rgba(0,0,0,0.5);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:15px;cursor:pointer;z-index:5;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px)}
+.tp-av-wrap{margin-top:-34px;text-align:center;position:relative;z-index:3}
+.tp-av-big{width:68px;height:68px;border-radius:50%;border:3px solid var(--wa-hdr);display:inline-flex;align-items:center;justify-content:center;overflow:hidden}
+.tp-av-big svg{width:100%;height:100%}
+.tp-info{padding:6px 18px 14px;text-align:center}
+.tp-nm{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:#fff}
+.tp-rl{font-size:12px;color:var(--accent);font-weight:600;margin-top:2px}
+.tp-sr{display:flex;justify-content:center;gap:18px;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05)}
+.tp-st{text-align:center}
+.tp-st .n{font-family:'Outfit',sans-serif;font-size:17px;font-weight:700;color:#fff}
+.tp-st .l{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:.5px}
+.tp-bd{padding:14px 18px}
+.tp-sl{font-size:9px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
+.tp-certs{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:12px}
+.tp-ct{font-size:10.5px;padding:3px 7px;border-radius:100px;background:rgba(255,255,255,0.05);color:var(--txt);font-weight:500}
+.tp-sp{font-size:12.5px;color:var(--txt2);line-height:1.5;margin-bottom:12px}
+.tp-qt{font-size:12px;font-style:italic;color:var(--txt2);line-height:1.5;padding:9px 10px;background:rgba(0,0,0,0.2);border-radius:7px;border-left:2px solid var(--accent)}
+.tp-bk{display:block;width:100%;border:none;border-top:1px solid rgba(255,255,255,0.05);background:none;color:#00a884;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;padding:12px;cursor:pointer;transition:background .2s}
+.tp-bk:hover{background:rgba(0,168,132,0.06)}
+
+/* ============================================ */
+/* TRANSFORMATION CARDS — TEXT ONLY              */
+/* ============================================ */
+.tf-card{align-self:flex-start;max-width:86%;border-radius:9px;border-top-left-radius:2px;overflow:hidden;background:var(--wa-in);opacity:0;transform:translateY(10px);animation:mi .3s ease forwards;border-left:3px solid var(--accent)}
+.tf-bd{padding:10px 12px}
+.tf-bd .tfn{font-size:14px;font-weight:700;color:#fff}
+.tf-bd .tfr{font-size:12px;color:var(--accent);font-weight:600;margin-top:3px}
+.tf-bd .tfd{font-size:11px;color:var(--txt2);margin-top:2px}
+.tf-bd .tfq{font-size:12px;font-style:italic;color:var(--txt2);margin-top:6px;line-height:1.45;padding:7px 9px;background:rgba(0,0,0,0.15);border-radius:6px}
+.tf-bd .ts{font-size:10px;color:rgba(255,255,255,0.35);text-align:right;margin-top:5px}
+
+/* ============================================ */
+/* OFFER CARD                                    */
+/* ============================================ */
+.of-card{align-self:flex-start;max-width:86%;border-radius:9px;border-top-left-radius:2px;overflow:hidden;background:var(--wa-in);opacity:0;transform:translateY(10px);animation:mi .3s ease forwards}
+.of-top{padding:12px 12px 8px;background:linear-gradient(135deg,rgba(0,230,118,0.1),rgba(255,193,7,0.06))}
+.of-top .of-badge{display:inline-block;font-size:8px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#000;background:var(--accent);padding:2px 7px;border-radius:3px;margin-bottom:6px}
+.of-top h4{font-size:14px;font-weight:700;color:#fff;line-height:1.3}
+.of-top h4 .hl{color:#ffd54f}
+.of-items{padding:6px 12px 8px}
+.of-item{display:flex;align-items:flex-start;gap:7px;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.025);font-size:12.5px;color:var(--txt)}
+.of-item:last-child{border:none}
+.of-item .oi{font-size:14px;flex-shrink:0;margin-top:1px}
+.of-item strong{color:#fff}
+.of-item .sv{color:var(--accent);font-weight:700;font-size:11px}
+.of-ft{padding:6px 12px 8px;font-size:11px;color:var(--txt2);border-top:1px solid rgba(255,255,255,0.03)}
+.of-ft .ts{font-size:10px;color:rgba(255,255,255,0.35);text-align:right;margin-top:3px}
+
+.foot{text-align:center;padding:0 20px 44px;position:relative;z-index:1}
+.foot p{color:var(--txt2);font-size:12px}
+.foot a{color:var(--accent);text-decoration:none;font-weight:600}
+
+@keyframes mi{to{opacity:1;transform:translateY(0)}}
+@keyframes fi{to{opacity:1}}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes su{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes si{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes bn{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-5px);opacity:1}}
+
+@media(max-width:420px){
+  .phone{border-radius:0;border:none;height:100vh;height:100dvh;width:100%}
+  .hero,.foot{display:none}
+  .wrap{padding:0}
+  body{background:var(--wa-dark)}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="pill">Interactive Demo</div>
+  <h1>Your Gym on<br><em>WhatsApp Autopilot</em></h1>
+  <p>Experience the exact WhatsApp bot your gym visitors will interact with — from Google search to booked trial.</p>
+  <div class="hint">&#8595; Tap the buttons inside to explore all flows</div>
+</div>
+
+<div class="wrap">
+  <div class="phone" id="P">
+    <div class="hdr">
+      <span class="back">&#8249;</span>
+      <div class="av">FG</div>
+      <div class="info">
+        <h3>Fitness Garage Gym <span class="vf">&#10004;</span></h3>
+        <span>online</span>
+      </div>
+    </div>
+    <div class="chat" id="C"></div>
+    <div class="rb" id="RB">
+      <button class="rbtn" onclick="restart()">&#8635; Restart Demo</button>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <p>Powered by <a href="#">Aethraa AI Solutions</a> &#8212; Smart WhatsApp Automation for Gyms</p>
+</div>
+
+<script>
+var GYM="Fitness Garage Gym";
+var C=document.getElementById('C'),P=document.getElementById('P'),RB=document.getElementById('RB');
+var TT=[];
+function ct(){var d=new Date(),h=d.getHours(),m=d.getMinutes(),a=h>=12?'PM':'AM';h=h%12||12;return h+':'+(m<10?'0'+m:m)+' '+a}
+function clear(){TT.forEach(function(t){clearTimeout(t)});TT=[];C.innerHTML='';RB.style.display='none';P.querySelectorAll('.ov,.tp-ov,.fac-ov').forEach(function(e){e.remove()})}
+function dl(ms){return new Promise(function(r){var t=setTimeout(r,ms);TT.push(t)})}
+function sc(){C.scrollTop=C.scrollHeight}
+
+function msg(text,type){
+  type=type||'i';var el=document.createElement('div');el.className='m '+type;
+  var tk=type==='o'?'<span class="tk">\u2713\u2713</span>':'';
+  el.innerHTML=text+' <span class="t">'+ct()+' '+tk+'</span>';C.appendChild(el);sc();
+}
+function typ(){var el=document.createElement('div');el.className='ty';el.id='TY';el.innerHTML='<span></span><span></span><span></span>';C.appendChild(el);sc()}
+function utyp(){var e=document.getElementById('TY');if(e)e.remove()}
+
+function btns(arr,cb){
+  var w=document.createElement('div');w.className='bw';
+  arr.forEach(function(b){var btn=document.createElement('button');btn.className='bt';btn.textContent=b.label;btn.onclick=function(){w.querySelectorAll('.bt').forEach(function(x){x.classList.add('ck');x.style.opacity='.5'});btn.style.opacity='1';cb(b)};w.appendChild(btn)});
+  C.appendChild(w);sc();
+}
+
+function listMsg(body,btnLabel,sections,cb){
+  var w=document.createElement('div');w.className='lm';
+  w.innerHTML='<div class="lb">'+body+' <span class="t">'+ct()+'</span></div><button class="lbtn">\u2630 '+btnLabel+'</button>';
+  C.appendChild(w);sc();
+  w.querySelector('.lbtn').onclick=function(){openSheet(sections,cb)};
+  var t=setTimeout(function(){openSheet(sections,cb)},1200);TT.push(t);
+}
+function openSheet(sections,cb){
+  P.querySelectorAll('.ov').forEach(function(e){e.remove()});
+  var o=document.createElement('div');o.className='ov';var h='';
+  sections.forEach(function(s){if(s.title)h+='<div class="sh-sec">'+s.title+'</div>';s.rows.forEach(function(r){h+='<div class="sh-r" data-id="'+r.id+'"><div class="rt">'+r.title+'</div>'+(r.desc?'<div class="rd">'+r.desc+'</div>':'')+'</div>'})});
+  o.innerHTML='<div class="sh"><div class="sh-h"><h4>Select an option</h4><button class="sh-x">\u2715</button></div>'+h+'</div>';
+  P.appendChild(o);o.querySelector('.sh-x').onclick=function(){o.remove()};
+  o.querySelectorAll('.sh-r').forEach(function(r){r.onclick=function(){o.remove();cb(r.dataset.id,r.querySelector('.rt').textContent)}});
+}
+function confirmCard(html){var el=document.createElement('div');el.className='cc';el.innerHTML=html;C.appendChild(el);sc()}
+
+// Trainer avatar SVGs
+function trainerSvg(color1,color2,initials){
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 80"><defs><linearGradient id="ta'+initials+'" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+color1+'"/><stop offset="1" stop-color="'+color2+'"/></linearGradient></defs><rect width="80" height="80" fill="url(#ta'+initials+')"/><circle cx="40" cy="28" r="14" fill="rgba(255,255,255,0.2)"/><ellipse cx="40" cy="62" rx="22" ry="18" fill="rgba(255,255,255,0.15)"/><text x="40" y="70" text-anchor="middle" font-family="Outfit,sans-serif" font-size="14" font-weight="800" fill="rgba(255,255,255,0.6)">'+initials+'</text></svg>'
+}
+function trainerBanner(color1,color2){
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 120"><defs><linearGradient id="tb" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="'+color1+'"/><stop offset="1" stop-color="'+color2+'"/></linearGradient></defs><rect width="400" height="120" fill="url(#tb)"/><circle cx="50" cy="60" r="30" fill="rgba(255,255,255,0.05)"/><circle cx="350" cy="40" r="40" fill="rgba(255,255,255,0.03)"/><circle cx="200" cy="100" r="50" fill="rgba(255,255,255,0.02)"/><rect x="0" y="115" width="400" height="5" fill="rgba(0,0,0,0.2)"/></svg>'
+}
+
+/* ===== FACILITIES — Clickable list with popup overlays ===== */
+var facilities=[
+  {name:'Strength Zone',icon:'\uD83C\uDFCB\uFE0F',bg:'#ff6b35',bg2:'#f7931e',
+   area:'3,500 sq ft',machines:22,
+   equip:['Hammer Strength','Life Fitness','Power Racks','Smith Machines','Cable Crossovers','Dumbbells 2\u201350 kg'],
+   desc:'Dedicated free weights and plate-loaded zone. 4 squat racks, 2 deadlift platforms, incline/decline/flat benches, and a full dumbbell wall.',
+   highlight:'Open 24/7 for early morning & late night lifters'},
+  {name:'Cardio Floor',icon:'\uD83C\uDFC3',bg:'#11998e',bg2:'#38ef7d',
+   area:'2,000 sq ft',machines:18,
+   equip:['Treadmills','Ellipticals','Rowing Machines','Spin Bikes','Stair Climbers','Assault Bikes'],
+   desc:'15+ cardio machines with personal screens, fan cooling, and a dedicated HIIT sprint lane.',
+   highlight:'All machines have Bluetooth heart rate monitoring'},
+  {name:'Functional Training',icon:'\u26A1',bg:'#a18cd1',bg2:'#fbc2eb',
+   area:'2,500 sq ft',machines:0,
+   equip:['Battle Ropes','TRX Suspension','Plyo Boxes','Kettlebells','Slam Balls','Monkey Bars','Sled Track'],
+   desc:'Open-floor functional area for CrossFit WODs, circuit training, and athletic conditioning.',
+   highlight:'Rubberized flooring designed for heavy drops and explosive movements'},
+  {name:'Yoga & Stretching Studio',icon:'\uD83E\uDDD8',bg:'#1a1028',bg2:'#6441a5',
+   area:'1,200 sq ft',machines:0,
+   equip:['Yoga Mats','Foam Rollers','Resistance Bands','Bolsters','Straps','Balance Boards'],
+   desc:'Quiet, air-conditioned studio with soft lighting. Dedicated morning yoga batches, evening mobility sessions, and open stretching hours.',
+   highlight:'Natural wood flooring with aromatherapy diffusers'},
+  {name:'Locker Rooms & Amenities',icon:'\uD83D\uDEBF',bg:'#2d3436',bg2:'#636e72',
+   area:'800 sq ft',machines:0,
+   equip:['Hot Showers','Steam Room','Personal Lockers','Changing Rooms','Water Dispenser','Towel Service'],
+   desc:'Clean, well-maintained locker rooms with hot showers and a steam room for post-workout recovery.',
+   highlight:'Complimentary towel service for all members'}
+];
+
+function addFacilityCard(){
+  var el=document.createElement('div');el.className='fac-card';
+  var rows='';
+  for(var i=0;i<facilities.length;i++){
+    var f=facilities[i];
+    rows+='<div class="fac-row" data-i="'+i+'">'
+      +'<div class="fac-ico" style="background:linear-gradient(135deg,'+f.bg+','+f.bg2+')">'+f.icon+'</div>'
+      +'<div class="fac-rinf"><div class="frn">'+f.name+'</div><div class="frs">'+f.area+(f.machines?' \u00B7 '+f.machines+' machines':'')+'</div></div>'
+      +'<span class="fac-arr">\u203A</span></div>';
+  }
+  el.innerHTML='<div class="fac-hdr"><b>\uD83D\uDCF8 Our Facilities & Equipment</b><br>Tap any zone to see full details <span class="t">'+ct()+'</span></div>'+rows;
+  C.appendChild(el);sc();
+  el.querySelectorAll('.fac-row').forEach(function(r){
+    r.onclick=function(){showFacilityPopup(facilities[parseInt(r.dataset.i)])}
+  });
+}
+
+function showFacilityPopup(f){
+  P.querySelectorAll('.fac-ov').forEach(function(e){e.remove()});
+  var o=document.createElement('div');o.className='fac-ov';
+  var equipHtml='';
+  for(var i=0;i<f.equip.length;i++){equipHtml+='<span class="fp-eq">'+f.equip[i]+'</span>'}
+  o.innerHTML='<div class="fac-popup">'
+    +'<div class="fp-top" style="background:linear-gradient(135deg,'+f.bg+'22,'+f.bg2+'22)">'
+    +'<button class="fp-cls">\u2715</button>'
+    +'<div class="fp-icon">'+f.icon+'</div>'
+    +'<div class="fp-name">'+f.name+'</div>'
+    +'<div class="fp-tag">'+GYM+'</div>'
+    +'<div class="fp-stats">'
+    +'<div class="fp-stat"><div class="n">'+f.area.split(' ')[0]+'</div><div class="l">'+f.area.split(' ')[1]+'</div></div>'
+    +(f.machines?'<div class="fp-stat"><div class="n">'+f.machines+'</div><div class="l">Machines</div></div>':'')
+    +'<div class="fp-stat"><div class="n">'+f.equip.length+'</div><div class="l">Equipment</div></div>'
+    +'</div></div>'
+    +'<div class="fp-body">'
+    +'<div class="fp-sl">Equipment Available</div>'
+    +'<div class="fp-equip">'+equipHtml+'</div>'
+    +'<div class="fp-sl">About This Zone</div>'
+    +'<div class="fp-desc">'+f.desc+'</div>'
+    +'<div class="fp-highlight">\u2728 '+f.highlight+'</div>'
+    +'</div></div>';
+  P.appendChild(o);
+  o.querySelector('.fp-cls').onclick=function(){o.remove()};
+}
+
+/* ===== TRAINERS ===== */
+var trainers=[
+  {name:'Amit Verma',role:'Head Trainer \u2014 Transformation',years:8,c1:'#ff6b35',c2:'#f7931e',init:'AV',certs:['ACE Certified','ISSA CPT','CrossFit L1'],spec:'Body recomposition, contest prep & strength programming. 200+ client transformations and counting.',clients:200,rating:4.9,quote:'Fitness is not about being better than someone else \u2014 it is about being better than you used to be.'},
+  {name:'Priya Sharma',role:'Yoga & Mobility Coach',years:6,c1:'#a18cd1',c2:'#fbc2eb',init:'PS',certs:['RYT-500','Mobility Specialist','Prenatal Yoga'],spec:'Flexibility, injury rehab & stress management. Fuses classical yoga with functional mobility.',clients:150,rating:4.8,quote:'The body achieves what the mind believes. Breathe, move, transform.'},
+  {name:'Karan Singh',role:'Strength & CrossFit',years:10,c1:'#f5af19',c2:'#f12711',init:'KS',certs:['CrossFit L2','NSCA CSCS','Olympic Lifting'],spec:'Powerlifting, CrossFit WODs & athletic conditioning. National-level competitor with multiple state records.',clients:180,rating:4.9,quote:'Pain is temporary. The pride of a new PR lasts forever.'},
+  {name:'Dr. Neha Gupta',role:'Nutritionist & Diet Coach',years:7,c1:'#11998e',c2:'#38ef7d',init:'NG',certs:['M.Sc Nutrition','Sports Dietetics','Diabetes Educator'],spec:'Custom macro-based meal plans, sports nutrition & gut health. Works hand-in-hand with every trainer for holistic results.',clients:300,rating:5.0,quote:'Abs are made in the kitchen. Let me show you how delicious healthy can be.'}
+];
+
+function addTrainerCard(){
+  var el=document.createElement('div');el.className='tr-card';
+  var rows='';
+  for(var i=0;i<trainers.length;i++){
+    var t=trainers[i];
+    rows+='<div class="tr-row" data-i="'+i+'"><div class="tr-av">'+trainerSvg(t.c1,t.c2,t.init)+'</div><div class="tr-inf"><div class="trn">'+t.name+'</div><div class="trs">'+t.role+' \u00B7 '+t.years+' yrs</div></div><span class="tr-arr">\u203A</span></div>';
+  }
+  el.innerHTML='<div class="trh"><b>\uD83E\uDDD1\u200D\uD83C\uDFEB Our Training Team</b><br>Tap any trainer to view their full profile <span class="t">'+ct()+'</span></div>'+rows;
+  C.appendChild(el);sc();
+  el.querySelectorAll('.tr-row').forEach(function(r){
+    r.onclick=function(){showProfile(trainers[parseInt(r.dataset.i)])}
+  });
+}
+
+function showProfile(t){
+  P.querySelectorAll('.tp-ov').forEach(function(e){e.remove()});
+  var o=document.createElement('div');o.className='tp-ov';
+  var certsHtml='';
+  for(var i=0;i<t.certs.length;i++){certsHtml+='<span class="tp-ct">'+t.certs[i]+'</span>'}
+  o.innerHTML='<div class="tp-card">'
+    +'<div class="tp-ban"><button class="tp-cls">\u2715</button>'+trainerBanner(t.c1,t.c2)+'</div>'
+    +'<div class="tp-av-wrap"><div class="tp-av-big">'+trainerSvg(t.c1,t.c2,t.init)+'</div></div>'
+    +'<div class="tp-info"><div class="tp-nm">'+t.name+'</div><div class="tp-rl">'+t.role+'</div>'
+    +'<div class="tp-sr"><div class="tp-st"><div class="n">'+t.years+'</div><div class="l">Years</div></div><div class="tp-st"><div class="n">'+t.clients+'+</div><div class="l">Clients</div></div><div class="tp-st"><div class="n">'+t.rating+'</div><div class="l">Rating \u2B50</div></div></div></div>'
+    +'<div class="tp-bd"><div class="tp-sl">Certifications</div><div class="tp-certs">'+certsHtml+'</div>'
+    +'<div class="tp-sl">About</div><div class="tp-sp">'+t.spec+'</div>'
+    +'<div class="tp-qt">\u201C'+t.quote+'\u201D</div></div>'
+    +'<button class="tp-bk">\uD83C\uDFCB\uFE0F Book a Trial with '+t.name.split(' ')[0]+'</button></div>';
+  P.appendChild(o);
+  o.querySelector('.tp-cls').onclick=function(){o.remove()};
+  o.querySelector('.tp-bk').onclick=function(){o.remove();msg('\uD83C\uDFCB\uFE0F Book Trial with '+t.name.split(' ')[0],'o')};
+}
+
+/* ===== TRANSFORMATIONS — Text only ===== */
+var transforms=[
+  {name:'Rohit, 28',result:'Lost 22 kg',dur:'6 months \u00B7 Trainer Amit',quote:'The trainers here actually care. Best decision I made.'},
+  {name:'Sneha, 32',result:'Lost 4 dress sizes, gained strength',dur:'8 months \u00B7 Trainer Priya',quote:'I have tried 5 gyms. This is the one that stuck.'},
+  {name:'Vikram, 45',result:'Reversed pre-diabetes',dur:'10 months \u00B7 Diet + Training',quote:'My doctor was shocked at my 3-month checkup.'}
+];
+
+function addTransformCard(t){
+  var el=document.createElement('div');el.className='tf-card';
+  el.innerHTML='<div class="tf-bd">'
+    +'<div class="tfn">'+t.name+'</div>'
+    +'<div class="tfr">\u2705 '+t.result+'</div>'
+    +'<div class="tfd">\u23F1 '+t.dur+'</div>'
+    +'<div class="tfq">\u201C'+t.quote+'\u201D</div>'
+    +'<div class="ts">'+ct()+'</div></div>';
+  C.appendChild(el);sc();
+}
+
+/* ===== OFFER CARD ===== */
+function addOfferCard(){
+  var el=document.createElement('div');el.className='of-card';
+  el.innerHTML='<div class="of-top"><span class="of-badge">\uD83C\uDFF7\uFE0F Limited Time</span><h4>March Special \u2014 Save Big on <span class="hl">6 & 12 Month</span> Plans!</h4></div>'
+    +'<div class="of-items">'
+    +'<div class="of-item"><span class="oi">\uD83D\uDD25</span><div><strong>New Joiner Discount</strong><br>20% off on 6 & 12-month plans<br><span class="sv">Save up to \u20B95,600</span></div></div>'
+    +'<div class="of-item"><span class="oi">\uD83C\uDF81</span><div><strong>Buddy Deal</strong><br>Join with a friend \u2014 both get 1 month free</div></div>'
+    +'<div class="of-item"><span class="oi">\u26A1</span><div><strong>Early Bird Bonus</strong><br>Sign up this week \u2192 Free PT session</div></div>'
+    +'</div><div class="of-ft">\u23F3 Valid till <strong>31 March 2026</strong>. New members only.<div class="ts">'+ct()+'</div></div>';
+  C.appendChild(el);sc();
+}
+
+
+/* ========================================== */
+/* MAIN CONVERSATION FLOW                      */
+/* ========================================== */
+
+function showMenu(){
+  btns([
+    {label:'\uD83C\uDFCB\uFE0F Book Free Trial',id:'trial'},
+    {label:'\uD83D\uDCB0 Membership Plans',id:'plans'},
+    {label:'\uD83C\uDFE2 Explore Our Gym',id:'explore'}
+  ],function(b){
+    if(b.id==='trial')runTrial();
+    else if(b.id==='plans')runPlans();
+    else runExplore();
+  });
+}
+
+async function backToMenu(){
+  await dl(600);msg('Anything else I can help with? \uD83D\uDC47');await dl(400);showMenu();
+}
+
+/* ---- TRIAL ---- */
+async function runTrial(){
+  msg('\uD83C\uDFCB\uFE0F Book Free Trial','o');await dl(600);typ();await dl(1000);utyp();
+  listMsg('Awesome choice! \uD83D\uDCAA Before we book \u2014 <b>what is your main fitness goal?</b>','Select Your Goal',
+    [{title:'Fitness Goals',rows:[
+      {id:'wl',title:'\uD83D\uDD25 Weight Loss',desc:'Burn fat, get lean'},
+      {id:'mb',title:'\uD83D\uDCAA Muscle Building',desc:'Gain size & strength'},
+      {id:'gf',title:'\uD83C\uDFC3 General Fitness',desc:'Stay active & healthy'},
+      {id:'cf',title:'\u26A1 Crossfit / Functional',desc:'High-intensity training'},
+      {id:'yg',title:'\uD83E\uDDD8 Yoga & Flexibility',desc:'Stretch, breathe, recover'},
+      {id:'ex',title:'\uD83D\uDC40 Just Exploring',desc:'See what fits me'}
+    ]}],async function(id,title){
+      msg(title,'o');await dl(600);typ();await dl(900);utyp();
+      var goal=title.replace(/^[^\s]+\s/,'');
+      msg('Great pick! <b>'+goal+'</b> it is. \uD83C\uDFAF\n\nWhen would you like to come in?');await dl(400);
+      btns([{label:'\uD83D\uDCC5 Today',id:'today'},{label:'\uD83D\uDCC5 Tomorrow',id:'tmr'},{label:'\uD83D\uDCC5 Pick a Day',id:'pick'}],async function(db){
+        msg(db.label,'o');await dl(600);typ();await dl(900);utyp();
+
+        // If Pick a Day, show date list first
+        if(db.id==='pick'){
+          var dates=[];
+          var now=new Date();
+          for(var di=2;di<=6;di++){
+            var dt=new Date(now);dt.setDate(dt.getDate()+di);
+            var dayNames=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+            var monNames=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+            dates.push({id:'d'+di,title:dayNames[dt.getDay()]+', '+dt.getDate()+' '+monNames[dt.getMonth()]});
+          }
+          listMsg('Pick a day that works for you:','Select Date',
+            [{title:'Available Dates',rows:dates}],
+            async function(did,dateLabel){
+              msg(dateLabel,'o');await dl(600);typ();await dl(900);utyp();
+              showTimeSlots(dateLabel,goal);
+            });
+        } else {
+          var day=db.label.replace('\uD83D\uDCC5 ','');
+          showTimeSlots(day,goal);
+        }
+      });
+    });
+}
+
+async function showTimeSlots(day,goal){
+  listMsg('Perfect \u2014 <b>'+day+'</b> works! What time suits you?','Select Time Slot',
+    [{title:'\uD83C\uDF05 Morning',rows:[{id:'6a',title:'6:00 AM'},{id:'7a',title:'7:00 AM'},{id:'8a',title:'8:00 AM'},{id:'9a',title:'9:00 AM'}]},
+     {title:'\uD83C\uDF07 Evening',rows:[{id:'5p',title:'5:00 PM'},{id:'6p',title:'6:00 PM'},{id:'7p',title:'7:00 PM'},{id:'8p',title:'8:00 PM'}]}],
+    async function(id,time){
+      msg(time,'o');await dl(600);typ();await dl(800);utyp();
+      msg('Almost done! \uD83D\uDCDD What is your <b>name</b>?');
+      await dl(1400);msg('Rahul','o');await dl(700);typ();await dl(1200);utyp();
+      confirmCard('<h4>\u2705 Trial Session Booked!</h4><div class="dr"><span class="ic">\uD83D\uDCCD</span> '+GYM+', Sector 45, Gurugram</div><div class="dr"><span class="ic">\uD83D\uDCC6</span> '+day+'</div><div class="dr"><span class="ic">\uD83D\uDD50</span> '+time+'</div><div class="dr"><span class="ic">\uD83C\uDFAF</span> Focus: '+goal+'</div><div class="tip"><b>What to bring:</b> Gym shoes, water bottle, towel & valid ID.<br>\uD83C\uDD7F\uFE0F Free parking at B1.<br><br>A certified trainer will be assigned. See you there! \uD83D\uDCAA</div>');
+      await dl(1200);typ();await dl(800);utyp();
+      msg('<em>\uD83D\uDCCD Location shared</em>\n<b>'+GYM+'</b>\nPlot 23, Sector 45, Golf Course Rd\n<a style="color:#53bdeb">Open in Google Maps \u2197</a>');
+      await backToMenu();
+    });
+}
+
+/* ---- PLANS (with Current Offers button right after plan selection) ---- */
+async function runPlans(){
+  msg('\uD83D\uDCB0 Membership Plans','o');await dl(600);typ();await dl(1100);utyp();
+  listMsg('Here are our membership plans \u2014 <b>all include full gym access + locker + fitness assessment</b>:','View All Plans',
+    [{title:'Membership Plans',rows:[
+      {id:'1m',title:'1 Month \u2014 \u20B93,500',desc:'Flexible, no commitment'},
+      {id:'3m',title:'3 Months \u2014 \u20B99,000',desc:'\u2B50 Most Popular \u2014 Save \u20B91,500'},
+      {id:'6m',title:'6 Months \u2014 \u20B916,000',desc:'Serious gains \u2014 Save \u20B95,000'},
+      {id:'12m',title:'12 Months \u2014 \u20B928,000',desc:'Best value \u2014 Save \u20B914,000'}
+    ]}],async function(id,plan){
+      msg(plan,'o');await dl(600);typ();await dl(1000);utyp();
+      msg('Great choice! <b>'+plan+'</b> \uD83D\uDD25\n\nWhat would you like to do next?');
+      await dl(400);
+      btns([
+        {label:'\uD83C\uDFF7\uFE0F Current Offers',id:'offers'},
+        {label:'\uD83E\uDD38 View Add-ons',id:'addons'},
+        {label:'\uD83C\uDFCB\uFE0F Book Free Trial',id:'trial'},
+        {label:'\uD83D\uDCDE Talk to Us',id:'call'}
+      ],async function(btn){
+        msg(btn.label,'o');await dl(600);typ();await dl(900);utyp();
+
+        if(btn.id==='offers'){
+          addOfferCard();await dl(1200);
+          msg('Want to <b>try a free trial</b> before committing? No strings attached!');await dl(400);
+          btns([{label:'\uD83C\uDFCB\uFE0F Book Free Trial',id:'trial'},{label:'\uD83D\uDC4D I will Visit Directly',id:'visit'}],async function(b2){
+            msg(b2.label,'o');await dl(600);typ();await dl(800);utyp();
+            if(b2.id==='trial')msg('Let us get you booked! Taking you to trial booking... \uD83C\uDFCB\uFE0F');
+            else msg('\uD83D\uDCCD <b>'+GYM+'</b>\nPlot 23, Sector 45, Golf Course Rd\n\n\u23F0 5:30 AM \u2013 10:30 PM (Mon\u2013Sat)\n\uD83C\uDD7F\uFE0F Free parking at B1\n\nAsk for Amit at the front desk!');
+            await backToMenu();
+          });
+        }
+        else if(btn.id==='addons'){
+          listMsg('Supercharge your <b>'+plan+'</b> with add-ons:','Browse Add-ons',
+            [{title:'Available Add-ons',rows:[
+              {id:'pt',title:'\uD83E\uDDD1\u200D\uD83C\uDFEB Personal Training \u2014 \u20B94,000/mo',desc:'1-on-1 certified trainer'},
+              {id:'diet',title:'\uD83E\uDD57 Diet & Nutrition \u2014 \u20B92,000',desc:'Custom meal plan'},
+              {id:'grp',title:'\uD83E\uDD38 Group Classes \u2014 \u20B91,500/mo',desc:'Zumba, HIIT, Yoga & more'},
+              {id:'no',title:'No Add-ons, Just the Plan',desc:''}
+            ]}],async function(aid,addon){
+              msg(addon,'o');await dl(600);typ();await dl(800);utyp();
+              msg('Got it! Want to <b>try a free trial</b> before committing?');await dl(400);
+              btns([{label:'\uD83C\uDFCB\uFE0F Book Free Trial',id:'trial'},{label:'\uD83C\uDFF7\uFE0F See Offers',id:'offers'},{label:'\uD83D\uDC4D I will Visit Directly',id:'visit'}],async function(b3){
+                msg(b3.label,'o');await dl(600);typ();await dl(800);utyp();
+                if(b3.id==='offers'){addOfferCard();await dl(1000);msg('Ready to get started?');await dl(400);
+                  btns([{label:'\uD83C\uDFCB\uFE0F Book Free Trial',id:'trial'},{label:'\uD83D\uDC4D Visit Directly',id:'visit'}],async function(b4){
+                    msg(b4.label,'o');await dl(500);typ();await dl(800);utyp();
+                    if(b4.id==='trial')msg('Let us get you booked! \uD83C\uDFCB\uFE0F');
+                    else msg('\uD83D\uDCCD <b>'+GYM+'</b>\nPlot 23, Sector 45, Golf Course Rd\n\nAsk for Amit at the front desk!');
+                    await backToMenu();
+                  });
+                }
+                else if(b3.id==='trial'){msg('Let us get you booked! Taking you to trial booking... \uD83C\uDFCB\uFE0F');await backToMenu();}
+                else{msg('\uD83D\uDCCD <b>'+GYM+'</b>\nPlot 23, Sector 45, Golf Course Rd\n\n\u23F0 5:30 AM \u2013 10:30 PM (Mon\u2013Sat)\n\uD83C\uDD7F\uFE0F Free parking at B1');await backToMenu();}
+              });
+            });
+        }
+        else if(btn.id==='trial'){
+          msg('Let us get you booked! Taking you to trial booking... \uD83C\uDFCB\uFE0F');await backToMenu();
+        }
+        else{
+          msg('\uD83D\uDCDE <b>+91 98XXX XXXXX</b> (Amit, Manager)\n\u23F0 Available 6 AM \u2013 10 PM, all days.');await backToMenu();
+        }
+      });
+    });
+}
+
+/* ---- EXPLORE (Facilities & Trainers PAUSE until user taps Continue) ---- */
+async function runExplore(){
+  msg('\uD83C\uDFE2 Explore Our Gym','o');await dl(600);typ();await dl(1000);utyp();
+  listMsg('Here is everything about <b>'+GYM+'</b> \u2014 tap to explore:','Explore Options',
+    [{title:'Know More',rows:[
+      {id:'fac',title:'\uD83D\uDCF8 Facilities & Equipment',desc:'Tap to explore each zone'},
+      {id:'trn',title:'\uD83E\uDDD1\u200D\uD83C\uDFEB Our Trainers',desc:'Tap to see full profiles'},
+      {id:'time',title:'\uD83D\uDD50 Timings & Location',desc:'Hours, address & parking'},
+      {id:'res',title:'\u2B50 Member Transformations',desc:'Real member results'}
+    ]}],async function(id,title){
+      msg(title,'o');await dl(600);typ();await dl(1200);utyp();
+
+      if(id==='fac'){
+        addFacilityCard();
+        await dl(400);
+        msg('\uD83D\uDC46 Tap any zone above to see equipment details, area size & highlights. When done, tap below to continue.');
+        await dl(400);
+        btns([{label:'\u2705 Done Exploring \u2014 Continue',id:'cont'}],async function(){
+          msg('\u2705 Done Exploring \u2014 Continue','o');
+          await showExploreCTA();
+        });
+      }
+      else if(id==='trn'){
+        addTrainerCard();
+        await dl(400);
+        msg('\uD83D\uDC46 Tap any trainer to view their full profile. When done, tap below to continue.');
+        await dl(400);
+        btns([{label:'\u2705 Done Exploring \u2014 Continue',id:'cont'}],async function(){
+          msg('\u2705 Done Exploring \u2014 Continue','o');
+          await showExploreCTA();
+        });
+      }
+      else if(id==='time'){
+        msg('<b>\uD83D\uDD50 Timings & Location</b>\n\n\u23F0 <b>Mon \u2013 Sat:</b> 5:30 AM \u2013 10:30 PM\n\u23F0 <b>Sunday:</b> 7:00 AM \u2013 1:00 PM\n\n\uD83D\uDCCD Plot 23, Sector 45, Golf Course Rd\nGurugram, Haryana 122003\n\n\uD83C\uDD7F\uFE0F Free parking at B1\n\uD83D\uDE87 5 min from HUDA City Centre Metro');
+        await showExploreCTA();
+      }
+      else if(id==='res'){
+        msg('Real results from real members \uD83D\uDCAA');
+        for(var j=0;j<transforms.length;j++){await dl(700);addTransformCard(transforms[j])}
+        await dl(500);
+        msg('\uD83D\uDCF8 <em>Before/after photos of each member will be sent here when the bot goes live.</em>');
+        await showExploreCTA();
+      }
+    });
+}
+
+async function showExploreCTA(){
+  await dl(1000);
+  msg('Impressed? \uD83D\uDE0E Book a <b>free trial</b> and experience it yourself!');
+  await dl(400);
+  btns([{label:'\uD83C\uDFCB\uFE0F Book Free Trial',id:'trial'},{label:'\uD83D\uDD19 Back to Menu',id:'menu'}],async function(btn){
+    msg(btn.label,'o');await dl(500);
+    if(btn.id==='trial'){typ();await dl(800);utyp();msg('Let us get you booked! Taking you to trial booking... \uD83C\uDFCB\uFE0F')}
+    await backToMenu();
+  });
+}
+
+/* ===== START ===== */
+async function start(){
+  clear();await dl(600);
+  msg('Hi','o');
+  await dl(700);typ();await dl(1200);utyp();
+  msg('Hey there! \uD83D\uDC4B Welcome to <b>'+GYM+'</b> \u2014 Gurugram\'s most results-driven fitness centre.\n\nHow can we help you today?');
+  await dl(400);showMenu();
+}
+function restart(){start()}
+start();
+</script>
+</body>
+</html>
